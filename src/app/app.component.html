@@ -1,177 +1,296 @@
-<nav class="bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700">
-  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-    <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">
-      <img src="https://flowbite.com/docs/images/logo.svg" class="h-8" alt="Flowbite Logo"/>
-      <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Flowbite</span>
-    </a>
-    <button data-collapse-toggle="navbar-dropdown" type="button"
-            class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-            aria-controls="navbar-dropdown" aria-expanded="false">
-      <span class="sr-only">Open main menu</span>
-      <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M1 1h15M1 7h15M1 13h15"/>
-      </svg>
-    </button>
-    <div class="hidden w-full md:block md:w-auto" id="navbar-dropdown">
-      <ul
-        class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-        <li>
-          <a href="#"
-             class="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500 dark:bg-blue-600 md:dark:bg-transparent"
-             aria-current="page">Home</a>
-        </li>
-        <li>
-          <button id="dropdownNavbarLink" data-dropdown-toggle="dropdownNavbar"
-                  class="flex items-center justify-between w-full py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:border-gray-700 dark:hover:bg-gray-700 md:dark:hover:bg-transparent">
-            Dropdown
-            <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                 viewBox="0 0 10 6">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="m1 1 4 4 4-4"/>
-            </svg>
-          </button>
-          <!-- Dropdown menu -->
-          <div id="dropdownNavbar"
-               class="z-10 hidden font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
-            <ul class="py-2 text-sm text-gray-700 dark:text-gray-400" aria-labelledby="dropdownLargeButton">
-              <li>
-                <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Dashboard</a>
-              </li>
-              <li>
-                <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Settings</a>
-              </li>
-              <li>
-                <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Earnings</a>
-              </li>
-            </ul>
-            <div class="py-1">
-              <a href="#"
-                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Sign
-                out</a>
-            </div>
-          </div>
-        </li>
-        <li>
-          <a href="#"
-             class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Services</a>
-        </li>
-        <li>
-          <a href="#"
-             class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Pricing</a>
-        </li>
-        <li>
-          <a href="#"
-             class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Contact</a>
-        </li>
+<div class="portfolio relative min-h-screen overflow-x-hidden bg-surface text-content">
+  <!-- Subtle ambient -->
+  <div class="pointer-events-none fixed inset-0 -z-10" aria-hidden="true">
+    <div class="ambient-glow ambient-glow--violet"></div>
+    <div class="ambient-glow ambient-glow--blue"></div>
+    <div class="grid-bg"></div>
+  </div>
+
+  <!-- Sticky navbar -->
+  <header
+    class="navbar"
+    [class.navbar--scrolled]="navScrolled()"
+    @fadeIn
+  >
+    <nav class="navbar__inner">
+      <button type="button" (click)="scrollTo('hero')" class="logo">
+        J<span class="text-accent-violet">.</span>O
+      </button>
+
+      <ul class="navbar__links hidden md:flex">
+        @for (link of content().nav; track link.id) {
+          <li>
+            <button
+              type="button"
+              (click)="scrollTo(link.id)"
+              class="nav-link"
+              [class.nav-link--active]="activeSection() === link.id"
+              [class.nav-link--featured]="isFeaturedSection(link.id)"
+            >
+              {{ link.label }}
+            </button>
+          </li>
+        }
       </ul>
-    </div>
-    <button
-      class="flex flex-shrink-0 rounded border align-items-center justify-content-center bg-white dark:bg-slate-800 p-1 transition-all transition-duration-300 hover:border-blue-300 dark:hover:border-blue-600"
-      (click)="darkMode.set(!darkMode())"
-    >
-      <svg *ngIf="!darkMode()" class="text-gray-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-           width="16" height="16" fill="none" viewBox="0 0 24 24">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 5V3m0 18v-2M7.05 7.05 5.636 5.636m12.728 12.728L16.95 16.95M5 12H3m18 0h-2M7.05 16.95l-1.414 1.414M18.364 5.636 16.95 7.05M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"/>
-      </svg>
-      <svg *ngIf="darkMode()" width="16" height="16" class="text-gray-600" aria-hidden="true"
-           xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 21a9 9 0 0 1-.5-17.986V3c-.354.966-.5 1.911-.5 3a9 9 0 0 0 9 9c.239 0 .254.018.488 0A9.004 9.004 0 0 1 12 21Z"/>
-      </svg>
-    </button>
-  </div>
-</nav>
 
-<div class="bg-gray-50 py-24 sm:py-32">
-  <div class="mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8">
-    <h2 class="text-center text-base/7 font-semibold text-indigo-600">Deploy faster</h2>
-    <p
-      class="mx-auto mt-2 max-w-lg text-pretty text-center text-4xl font-medium tracking-tight text-gray-950 sm:text-5xl">
-      Portfolio tes morts.</p>
-    <div class="mt-10 grid gap-4 sm:mt-16 lg:grid-cols-3 lg:grid-rows-2">
-      <div class="relative lg:row-span-2">
-        <div class="absolute inset-px rounded-lg bg-white lg:rounded-l-[2rem]"></div>
-        <div
-          class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] lg:rounded-l-[calc(2rem+1px)]">
-          <div class="px-8 pb-3 pt-8 sm:px-10 sm:pb-0 sm:pt-10">
-            <p class="mt-2 text-lg/7 font-medium tracking-tight text-gray-950 max-lg:text-center">Mobile friendly</p>
-            <p class="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">Anim aute id magna aliqua ad ad non
-              deserunt sunt. Qui irure qui lorem cupidatat commodo.</p>
-          </div>
-          <div class="relative min-h-[30rem] w-full grow [container-type:inline-size] max-lg:mx-auto max-lg:max-w-sm">
-            <div
-              class="absolute inset-x-10 bottom-0 top-10 overflow-hidden rounded-t-[12cqw] border-x-[3cqw] border-t-[3cqw] border-gray-700 bg-gray-900 shadow-2xl">
-              <img class="size-full object-cover object-top"
-                   src="https://tailwindui.com/plus/img/component-images/bento-03-mobile-friendly.png" alt="">
-            </div>
-          </div>
+      <div class="navbar__actions">
+        <div class="lang-switch" role="group" [attr.aria-label]="lang() === 'fr' ? 'Langue' : 'Language'">
+          <button
+            type="button"
+            class="lang-switch__btn"
+            [class.lang-switch__btn--active]="lang() === 'fr'"
+            (click)="setLang('fr')"
+          >
+            FR
+          </button>
+          <button
+            type="button"
+            class="lang-switch__btn"
+            [class.lang-switch__btn--active]="lang() === 'en'"
+            (click)="setLang('en')"
+          >
+            EN
+          </button>
         </div>
-        <div
-          class="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 lg:rounded-l-[2rem]"></div>
+        <button
+          type="button"
+          class="icon-btn md:hidden"
+          (click)="toggleMenu()"
+          [attr.aria-expanded]="menuOpen()"
+          aria-label="Menu"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+            @if (menuOpen()) {
+              <path d="M18 6 6 18M6 6l12 12"/>
+            } @else {
+              <path d="M4 8h16M4 16h16"/>
+            }
+          </svg>
+        </button>
       </div>
-      <div class="relative max-lg:row-start-1">
-        <div class="absolute inset-px rounded-lg bg-white max-lg:rounded-t-[2rem]"></div>
-        <div
-          class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] max-lg:rounded-t-[calc(2rem+1px)]">
-          <div class="px-8 pt-8 sm:px-10 sm:pt-10">
-            <p class="mt-2 text-lg/7 font-medium tracking-tight text-gray-950 max-lg:text-center">Performance</p>
-            <p class="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">Lorem ipsum, dolor sit amet consectetur
-              adipisicing elit maiores impedit.</p>
-          </div>
-          <div class="flex flex-1 items-center justify-center px-8 max-lg:pb-12 max-lg:pt-10 sm:px-10 lg:pb-2">
-            <img class="w-full max-lg:max-w-xs"
-                 src="https://tailwindui.com/plus/img/component-images/bento-03-performance.png" alt="">
-          </div>
-        </div>
-        <div
-          class="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 max-lg:rounded-t-[2rem]"></div>
+    </nav>
+
+    @if (menuOpen()) {
+      <div class="navbar__mobile" @fadeInUp>
+        <ul>
+          @for (link of content().nav; track link.id) {
+            <li>
+              <button type="button" (click)="scrollTo(link.id)" class="navbar__mobile-link">
+                {{ link.label }}
+              </button>
+            </li>
+          }
+        </ul>
       </div>
-      <div class="relative max-lg:row-start-3 lg:col-start-2 lg:row-start-2">
-        <div class="absolute inset-px rounded-lg bg-white"></div>
-        <div class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)]">
-          <div class="px-8 pt-8 sm:px-10 sm:pt-10">
-            <p class="mt-2 text-lg/7 font-medium tracking-tight text-gray-950 max-lg:text-center">Security</p>
-            <p class="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">Morbi viverra dui mi arcu sed. Tellus
-              semper adipiscing suspendisse semper morbi.</p>
+    }
+  </header>
+
+  <main class="main">
+    <!-- Hero -->
+    <section id="hero" class="hero" @heroSequence>
+      <div class="hero__grid">
+        <div class="hero__content">
+          <p class="hero-line eyebrow">{{ content().roles.join(' · ') }}</p>
+          <h1 class="hero-line hero__title">{{ content().name }}</h1>
+          <div class="hero-line hero-accent"></div>
+          <p class="hero-line hero__tagline">{{ content().tagline }}</p>
+
+          <div class="hero-line hero__ctas">
+            <button type="button" (click)="scrollTo('experience')" class="btn-primary">
+              {{ content().hero.ctaExperience }}
+            </button>
+            <button type="button" (click)="scrollTo('projects')" class="btn-secondary">
+              {{ content().hero.ctaProjects }}
+            </button>
+            <a [href]="'mailto:' + content().email" class="btn-ghost">{{ content().hero.ctaContact }}</a>
           </div>
-          <div class="flex flex-1 items-center [container-type:inline-size] max-lg:py-6 lg:pb-2">
-            <img class="h-[min(152px,40cqw)] object-cover object-center"
-                 src="https://tailwindui.com/plus/img/component-images/bento-03-security.png" alt="">
-          </div>
-        </div>
-        <div class="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5"></div>
-      </div>
-      <div class="relative lg:row-span-2">
-        <div class="absolute inset-px rounded-lg bg-white max-lg:rounded-b-[2rem] lg:rounded-r-[2rem]"></div>
-        <div
-          class="relative flex h-full flex-col overflow-hidden rounded-[calc(theme(borderRadius.lg)+1px)] max-lg:rounded-b-[calc(2rem+1px)] lg:rounded-r-[calc(2rem+1px)]">
-          <div class="px-8 pb-3 pt-8 sm:px-10 sm:pb-0 sm:pt-10">
-            <p class="mt-2 text-lg/7 font-medium tracking-tight text-gray-950 max-lg:text-center">Powerful APIs</p>
-            <p class="mt-2 max-w-lg text-sm/6 text-gray-600 max-lg:text-center">Sit quis amet rutrum tellus ullamcorper
-              ultricies libero dolor eget sem sodales gravida.</p>
-          </div>
-          <div class="relative min-h-[30rem] w-full grow">
-            <div class="absolute bottom-0 left-10 right-0 top-10 overflow-hidden rounded-tl-xl bg-gray-900 shadow-2xl">
-              <div class="flex bg-gray-800/40 ring-1 ring-white/5">
-                <div class="-mb-px flex text-sm font-medium leading-6 text-gray-400">
-                  <div class="border-b border-r border-b-white/20 border-r-white/10 bg-white/5 px-4 py-2 text-white">
-                    NotificationSetting.jsx
-                  </div>
-                  <div class="border-r border-gray-600/10 px-4 py-2">App.jsx</div>
-                </div>
+
+          <div class="hero-line hero__stats">
+            @for (stat of heroStats; track stat.value) {
+              <div class="stat">
+                <span class="stat__value">{{ stat.value }}</span>
+                <span class="stat__label">{{ statLabel(stat) }}</span>
               </div>
-              <div class="px-6 pb-14 pt-6">
-                <!-- Your code example -->
-              </div>
-            </div>
+            }
+          </div>
+
+          <div class="hero-line hero__meta">
+            <span class="status">
+              <span class="status__dot"></span>
+              {{ content().availability }}
+            </span>
+            <span class="text-content-muted">{{ content().location }}</span>
           </div>
         </div>
-        <div
-          class="pointer-events-none absolute inset-px rounded-lg shadow ring-1 ring-black/5 max-lg:rounded-b-[2rem] lg:rounded-r-[2rem]"></div>
+
+        <div class="hero-line hero__visual">
+          <div class="avatar-wrap">
+            <div class="avatar-ring" aria-hidden="true"></div>
+            <img [src]="avatarPath" [alt]="content().name" width="280" height="280" class="avatar-img" />
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+    </section>
+
+    <!-- Experience (featured) -->
+    <section id="experience" class="section section--featured">
+      <div #reveal class="reveal section__head">
+        <span class="section__label">{{ content().sections.experience.label }}</span>
+        <h2 class="section__title">{{ content().sections.experience.title }}</h2>
+        <p class="section__desc">
+          @if (lang() === 'fr') {
+            3 ans chez Cerfrance Lot — de l’alternance au CDD, du legacy Symfony aux outils métiers à grande échelle.
+          } @else {
+            3 years at Cerfrance Lot — from work-study to fixed-term, from legacy PHP to large-scale business tools.
+          }
+        </p>
+      </div>
+
+      <ol class="timeline">
+        @for (item of content().timeline; track item.title + item.period; let i = $index) {
+          <li
+            #reveal
+            class="reveal timeline__item"
+            [class.timeline__item--edu]="i === 3"
+            [style.--delay]="i"
+          >
+            <div class="timeline__marker" aria-hidden="true"></div>
+            <article class="card timeline__card">
+              <time class="timeline__date">{{ item.period }}</time>
+              <h3 class="timeline__role">{{ item.title }}</h3>
+              <p class="timeline__org">{{ item.org }}</p>
+              <p class="timeline__text">{{ item.description }}</p>
+            </article>
+          </li>
+        }
+      </ol>
+    </section>
+
+    <!-- Projects (featured) -->
+    <section id="projects" class="section section--featured">
+      <div #reveal class="reveal section__head">
+        <span class="section__label">{{ content().sections.projects.label }}</span>
+        <h2 class="section__title">{{ content().sections.projects.title }}</h2>
+      </div>
+
+      <div class="projects-grid">
+        @for (project of content().projects; track project.title; let i = $index) {
+          <article
+            #reveal
+            class="reveal card project-card"
+            [style.--delay]="i"
+          >
+            <div class="project-card__top">
+              <span class="badge">{{ projectStatusLabel(project.status) }}</span>
+              <span class="project-card__index">0{{ i + 1 }}</span>
+            </div>
+            <h3 class="project-card__title">{{ project.title }}</h3>
+            <p class="project-card__desc">{{ project.description }}</p>
+            <ul class="project-card__tags">
+              @for (tag of project.tags; track tag) {
+                <li>{{ tag }}</li>
+              }
+            </ul>
+          </article>
+        }
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="section">
+      <div #reveal class="reveal section__head">
+        <span class="section__label">{{ content().sections.about.label }}</span>
+        <h2 class="section__title">{{ content().sections.about.title }}</h2>
+      </div>
+
+      <div class="about-grid">
+        <div #reveal class="reveal about__text">
+          @for (paragraph of content().about; track $index) {
+            <p>{{ paragraph }}</p>
+          }
+        </div>
+        <div #reveal class="reveal" @scaleIn>
+          <article class="card card--education">
+            <span class="badge badge--accent">{{ content().education.level }}</span>
+            <h3 class="mt-4 text-lg font-semibold text-content">{{ content().education.degree }}</h3>
+            <p class="mt-1 text-sm font-medium text-accent-violet">{{ content().education.school }}</p>
+            <p class="text-xs text-content-muted">{{ content().education.period }}</p>
+            <p class="mt-4 text-sm leading-relaxed text-content-secondary">{{ content().education.description }}</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills -->
+    <section id="skills" class="section">
+      <div #reveal class="reveal section__head">
+        <span class="section__label">{{ content().sections.skills.label }}</span>
+        <h2 class="section__title">{{ content().sections.skills.title }}</h2>
+      </div>
+
+      <div class="skills-grid" @staggerList>
+        <article class="card skill-card">
+          <h3>{{ content().sections.skills.dev }}</h3>
+          <ul>
+            @for (skill of skillsByCategory('dev'); track skill.name) {
+              <li><span class="pill">{{ skill.name }}</span></li>
+            }
+          </ul>
+        </article>
+        <article class="card skill-card">
+          <h3>{{ content().sections.skills.agile }}</h3>
+          <ul>
+            @for (skill of skillsByCategory('agile'); track skill.name) {
+              <li><span class="pill pill--accent">{{ skill.name }}</span></li>
+            }
+          </ul>
+        </article>
+        <article class="card skill-card">
+          <h3>{{ content().sections.skills.tools }}</h3>
+          <ul>
+            @for (skill of skillsByCategory('tools'); track skill.name) {
+              <li><span class="pill">{{ skill.name }}</span></li>
+            }
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- Agile -->
+    <section id="agile" class="section">
+      <div #reveal class="reveal section__head">
+        <span class="section__label">{{ content().sections.agile.label }}</span>
+        <h2 class="section__title">{{ content().sections.agile.title }}</h2>
+        <p class="section__desc">{{ content().sections.agile.intro }}</p>
+      </div>
+
+      <div class="agile-grid">
+        @for (item of content().scrumHighlights; track item.label; let i = $index) {
+          <div #reveal class="reveal card agile-card" [style.--delay]="i">
+            <span class="agile-card__icon" aria-hidden="true">{{ item.icon }}</span>
+            <p>{{ item.label }}</p>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="section">
+      <div #reveal class="reveal card contact-card">
+        <span class="section__label">{{ content().sections.contact.label }}</span>
+        <h2 class="section__title mt-3">{{ content().sections.contact.title }}</h2>
+        <p class="mt-4 max-w-md text-content-secondary">{{ content().sections.contact.intro }}</p>
+        <div class="contact-card__actions">
+          <a [href]="'mailto:' + content().email" class="btn-primary">{{ content().email }}</a>
+          <a [href]="content().github" target="_blank" rel="noopener noreferrer" class="btn-secondary">GitHub</a>
+          <a [href]="content().linkedin" target="_blank" rel="noopener noreferrer" class="btn-ghost">LinkedIn</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>© {{ year }} {{ content().name }}</p>
+    <p>{{ content().footer.builtWith }}</p>
+  </footer>
 </div>
-
