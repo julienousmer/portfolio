@@ -40,3 +40,8 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Local design tooling (skills, previews)
+/.claude/
+/.impeccable/
+.taste-skill/

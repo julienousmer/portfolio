@@ -1,12 +1,10 @@
 import { TestBed } from '@angular/core/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     localStorage.removeItem('portfolio-lang');
     await TestBed.configureTestingModule({
-      imports: [BrowserAnimationsModule],
       declarations: [AppComponent],
     }).compileComponents();
   });
@@ -34,12 +32,25 @@ describe('AppComponent', () => {
     expect(localStorage.getItem('portfolio-lang')).toBe('en');
   });
 
-  it('should list the same skills in both languages', () => {
+  it('should list the same tools in both languages', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    const count = () => app.content().skills.reduce((n, g) => n + g.items.length, 0);
-    const fr = count();
+    const names = () => app.content().stack.layers.flatMap((l) => l.tools.map((t) => t.name)).join();
+    const fr = names();
     app.setLang('en');
-    expect(count()).toBe(fr);
+    expect(names()).toBe(fr);
+  });
+
+  it('should toggle and remember the dark theme', () => {
+    localStorage.removeItem('portfolio-theme');
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    fixture.detectChanges();
+    app.toggleTheme();
+    fixture.detectChanges();
+    expect(document.documentElement.dataset['theme']).toBe('dark');
+    expect(localStorage.getItem('portfolio-theme')).toBe('dark');
+    app.toggleTheme();
+    localStorage.removeItem('portfolio-theme');
   });
 });

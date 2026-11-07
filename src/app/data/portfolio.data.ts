@@ -3,67 +3,97 @@ export type Lang = 'fr' | 'en';
 /** A label that is identical in every language, or translated per language. */
 type Localized = string | Record<Lang, string>;
 
-export interface SkillGroup {
-  title: string;
-  accent?: boolean;
-  items: string[];
+/** A tool with its real logo, fetched by the taste-skill icon resolver into public/assets/icons. */
+export interface Tool {
+  name: string;
+  icon: string;
+  /** Wordmark logos (PHP) get a wide tile. */
+  wide?: boolean;
+  /** Black marks (none today) would invert on dark. */
+  ink?: boolean;
+}
+
+export interface StackItem extends Tool {
+  meta: string;
+}
+
+export interface StackLayer {
+  name: string;
+  note: string;
+  tools: StackItem[];
 }
 
 export interface Project {
   title: string;
+  kind: string;
   description: string;
   role: string;
-  tags: string[];
-  status: 'private' | 'school';
+  tools: Tool[];
 }
 
-export interface TimelineItem {
+export interface Row {
   period: string;
   title: string;
   org: string;
-  description: string;
 }
 
-export interface EducationItem {
-  period: string;
-  degree: string;
-  school: string;
-  description?: string;
+export interface Fact {
+  term: string;
+  value: string;
 }
 
 export interface PortfolioContent {
   name: string;
-  roles: string[];
-  tagline: string;
   email: string;
   github: string;
   linkedin: string;
   cvPath: string;
-  location: string;
-  availability: string;
   meta: { title: string; description: string };
-  photoAlt: string;
+  skip: string;
   nav: { id: string; label: string }[];
+  ui: { menu: string; langLabel: string; themeToDark: string; themeToLight: string };
+  photoAlt: string;
   hero: {
+    notice: string;
+    title: string;
+    lead: string;
     ctaCv: string;
     ctaContact: string;
+    /** The float card on the photo cycles through these, one every few seconds. */
+    floats: { live: string; when: string; title: string }[];
+    facts: Fact[];
   };
-  stats: { value: string; label: string }[];
-  sections: {
-    about: { label: string; title: string; languages: string };
-    skills: { label: string; title: string };
-    experience: { label: string; title: string; intro: string };
-    projects: { label: string; title: string; private: string; school: string; role: string };
-    education: { label: string };
-    contact: { label: string; title: string; intro: string; cv: string };
+  intranet: {
+    label: string;
+    title: string;
+    titleMuted: string;
+    lead: string;
+    points: Fact[];
+    diagram: { alt: string; center: string; spokes: { label: string; icon: string }[] };
   };
-  education: EducationItem[];
-  languages: string[];
-  about: string[];
-  skills: SkillGroup[];
-  timeline: TimelineItem[];
-  projects: Project[];
-  footer: { builtWith: string };
+  statement: { label: string; before: string; strong: string; after: string };
+  projects: { label: string; title: string; roleLabel: string; toolsLabel: string; items: Project[] };
+  path: {
+    label: string;
+    title: string;
+    work: string;
+    education: string;
+    languages: string;
+    jobs: Row[];
+    schools: Row[];
+    spoken: Fact[];
+  };
+  stack: {
+    label: string;
+    title: string;
+    titleMuted: string;
+    methods: string;
+    request: string;
+    response: string;
+    layers: StackLayer[];
+  };
+  close: { title: string; lead: string };
+  footer: { lede: string; contact: string; sections: string; trademarks: string; built: string };
 }
 
 const SHARED = {
@@ -74,37 +104,63 @@ const SHARED = {
   cvPath: 'CV_Julien_Devienne-Ousmer.pdf',
 };
 
-/** Single source for skills, so both languages always list the same items. */
-const SKILL_GROUPS: { title: Record<Lang, string>; accent?: boolean; items: Localized[] }[] = [
+const T = {
+  symfony: { name: 'Symfony', icon: 'symfony' },
+  php: { name: 'PHP 8', icon: 'php', wide: true },
+  doctrine: { name: 'Doctrine', icon: 'doctrine' },
+  twig: { name: 'Twig', icon: 'twig' },
+  angular: { name: 'Angular', icon: 'angular' },
+  typescript: { name: 'TypeScript', icon: 'typescript' },
+  react: { name: 'React', icon: 'react' },
+  vue: { name: 'Vue.js', icon: 'vue' },
+  tailwind: { name: 'Tailwind CSS', icon: 'tailwindcss' },
+  mysql: { name: 'MySQL', icon: 'mysql' },
+  phpunit: { name: 'PHPUnit', icon: 'phpunit' },
+  docker: { name: 'Docker', icon: 'docker' },
+  gitlab: { name: 'GitLab CI/CD', icon: 'gitlab' },
+  git: { name: 'Git', icon: 'git' },
+  linux: { name: 'Linux', icon: 'linux-tux' },
+  jira: { name: 'Jira', icon: 'jira' },
+} satisfies Record<string, Tool>;
+
+/** One layered stack for both languages, so FR and EN always list the same tools. */
+const LAYERS: { name: Record<Lang, string>; note: Record<Lang, string>; tools: { tool: Tool; meta: Localized }[] }[] = [
   {
-    title: { fr: 'Back-end', en: 'Back-end' },
-    items: ['PHP 8', 'Symfony', 'Doctrine ORM', 'Twig', 'Node.js'],
-  },
-  {
-    title: { fr: 'Front-end', en: 'Front-end' },
-    items: ['Angular', 'TypeScript', 'JavaScript', 'React', 'Vue.js', 'Stimulus', 'Tailwind CSS'],
-  },
-  {
-    title: { fr: 'Données, qualité & DevOps', en: 'Data, quality & DevOps' },
-    items: [
-      'MySQL',
-      'PHPUnit',
-      { fr: 'Tests unitaires & d’intégration', en: 'Unit & integration tests' },
-      'Git',
-      'GitLab CI/CD',
-      'Docker',
-      'Linux',
+    name: { fr: 'Front', en: 'Front end' },
+    note: { fr: 'Des interfaces typées et responsives', en: 'Typed, responsive interfaces' },
+    tools: [
+      { tool: T.angular, meta: { fr: 'Ce site, Fighter Stats', en: 'This site, Fighter Stats' } },
+      { tool: T.typescript, meta: { fr: 'Tout mon code front', en: 'All my front-end code' } },
+      { tool: T.tailwind, meta: { fr: 'L’intranet et ce site', en: 'The intranet and this site' } },
+      { tool: T.react, meta: { fr: 'Projets de formation', en: 'Training projects' } },
+      { tool: T.vue, meta: { fr: 'Projets de formation', en: 'Training projects' } },
     ],
   },
   {
-    title: { fr: 'Méthodes', en: 'Ways of working' },
-    accent: true,
-    items: [
-      'Scrum',
-      'Kanban',
-      'Jira',
-      { fr: 'Animation de réunions', en: 'Meeting facilitation' },
-      { fr: 'Documentation technique', en: 'Technical documentation' },
+    name: { fr: 'Back-end', en: 'Back end' },
+    note: { fr: 'Le cœur métier de l’intranet', en: 'The intranet’s business core' },
+    tools: [
+      { tool: T.symfony, meta: { fr: 'Mon socle depuis 2022', en: 'My core since 2022' } },
+      { tool: T.php, meta: { fr: 'PHP 8, depuis 2020', en: 'PHP 8, since 2020' } },
+      { tool: T.doctrine, meta: { fr: 'ORM et migrations', en: 'ORM and migrations' } },
+      { tool: T.twig, meta: { fr: 'Les gabarits de l’intranet', en: 'The intranet’s templates' } },
+    ],
+  },
+  {
+    name: { fr: 'Données', en: 'Data' },
+    note: { fr: 'Une base relationnelle modélisée de zéro', en: 'A relational database modelled from scratch' },
+    tools: [{ tool: T.mysql, meta: { fr: 'La base de l’intranet', en: 'The intranet’s database' } }],
+  },
+  {
+    name: { fr: 'Qualité & livraison', en: 'Quality & delivery' },
+    note: { fr: 'Testé à chaque push, livré en sprints', en: 'Tested on every push, shipped in sprints' },
+    tools: [
+      { tool: T.phpunit, meta: { fr: 'Tests unitaires et d’intégration', en: 'Unit and integration tests' } },
+      { tool: T.gitlab, meta: { fr: 'Les tests à chaque push', en: 'Tests on every push' } },
+      { tool: T.docker, meta: { fr: 'Environnements locaux', en: 'Local environments' } },
+      { tool: T.git, meta: { fr: 'Branches et revues', en: 'Branches and reviews' } },
+      { tool: T.linux, meta: { fr: 'Serveurs et terminal', en: 'Servers and shell' } },
+      { tool: T.jira, meta: { fr: 'Sprints Scrum', en: 'Scrum sprints' } },
     ],
   },
 ];
@@ -112,304 +168,303 @@ const SKILL_GROUPS: { title: Record<Lang, string>; accent?: boolean; items: Loca
 const localize = (value: Localized, lang: Lang): string =>
   typeof value === 'string' ? value : value[lang];
 
-const skillsFor = (lang: Lang): SkillGroup[] =>
-  SKILL_GROUPS.map((group) => ({
-    title: group.title[lang],
-    accent: group.accent,
-    items: group.items.map((item) => localize(item, lang)),
+const layersFor = (lang: Lang): StackLayer[] =>
+  LAYERS.map((l) => ({
+    name: l.name[lang],
+    note: l.note[lang],
+    tools: l.tools.map(({ tool, meta }) => ({ ...tool, meta: localize(meta, lang) })),
   }));
+
+const SPOKE_ICONS = ['ui:clipboard-list', 'ui:bar-chart-3', 'ui:file-text', 'ui:scale', 'ui:newspaper'];
+const spokes = (labels: string[]) => labels.map((label, i) => ({ label, icon: SPOKE_ICONS[i] }));
 
 const FR: PortfolioContent = {
   ...SHARED,
-  roles: ['Développeur Web Full-Stack', 'Symfony · Angular'],
-  tagline:
-    'Je conçois des intranets et des outils métiers fiables, de la base de données jusqu’à l’interface, avec Symfony et Angular.',
-  location: 'Toulouse, France',
-  availability: 'En CDI · à l’écoute d’opportunités',
   meta: {
     title: 'Julien Devienne-Ousmer — Développeur Web Full-Stack (Symfony, Angular)',
     description:
-      'Portfolio de Julien Devienne-Ousmer, développeur web full-stack à Toulouse : PHP/Symfony, Angular, TypeScript, MySQL. 4 ans d’expérience, Master Ingénierie Logicielle.',
+      'Développeur web full-stack à Toulouse : j’ai construit seul l’intranet de Cerfrance Lot, utilisé par 130 collaborateurs. PHP/Symfony, Angular, MySQL, Master Ingénierie Logicielle.',
   },
-  photoAlt: 'Photo de Julien Devienne-Ousmer',
+  skip: 'Aller au contenu',
   nav: [
-    { id: 'hero', label: 'Accueil' },
-    { id: 'experience', label: 'Expérience' },
-    { id: 'projects', label: 'Projets' },
-    { id: 'about', label: 'À propos' },
-    { id: 'skills', label: 'Compétences' },
-    { id: 'contact', label: 'Contact' },
+    { id: 'intranet', label: 'Intranet' },
+    { id: 'projets', label: 'Projets' },
+    { id: 'parcours', label: 'Parcours' },
+    { id: 'stack', label: 'Compétences' },
   ],
+  ui: {
+    menu: 'Menu',
+    langLabel: 'Langue',
+    themeToDark: 'Passer en thème sombre',
+    themeToLight: 'Passer en thème clair',
+  },
+  photoAlt: 'Julien Devienne-Ousmer, en t-shirt blanc, sourit face à l’objectif',
   hero: {
+    notice: 'En CDI chez Cerfrance Lot, à l’écoute d’un nouveau poste',
+    title: 'Développeur web full-stack à Toulouse',
+    lead: 'Je conçois des intranets et des outils métiers avec Symfony et Angular. Le dernier, je l’ai construit seul : 130 collaborateurs l’ouvrent chaque jour.',
     ctaCv: 'Télécharger mon CV',
     ctaContact: 'Me contacter',
+    floats: [
+      { live: 'CDI', when: 'Depuis juillet 2026', title: 'Développeur full-stack, Cerfrance Lot' },
+      { live: 'Intranet', when: 'Chaque jour', title: '130 collaborateurs l’utilisent' },
+      { live: 'Qualité', when: 'À chaque push', title: 'Tests PHPUnit dans GitLab CI' },
+    ],
+    facts: [
+      { term: 'Expérience', value: '4 ans en entreprise' },
+      { term: 'Diplôme', value: 'Master Ingénierie Logicielle' },
+      { term: 'Anglais', value: 'Courant, TOEIC 795' },
+    ],
   },
-  stats: [
-    { value: '4 ans', label: 'd’expérience en entreprise' },
-    { value: '130', label: 'collaborateurs utilisent mon intranet' },
-    { value: 'Bac+5', label: 'Master Ingénierie Logicielle' },
-  ],
-  sections: {
-    about: { label: 'À propos', title: 'Qui suis-je ?', languages: 'Langues' },
-    skills: { label: 'Compétences', title: 'Stack & méthodes' },
-    experience: {
-      label: 'Expérience',
-      title: 'Expérience professionnelle',
-      intro:
-        'Depuis 2022 chez Cerfrance Lot, de l’alternance au CDI : modernisation d’un intranet legacy, puis conception d’un nouvel intranet et d’outils métiers.',
-    },
-    projects: {
-      label: 'Projets',
-      title: 'Réalisations',
-      private: 'Projet interne',
-      school: 'Projet d’études',
-      role: 'Mon rôle',
-    },
-    education: { label: 'Formation' },
-    contact: {
-      label: 'Contact',
-      title: 'Travaillons ensemble',
-      intro: 'Un poste, un projet ou un simple échange ? Écrivez-moi, je réponds rapidement.',
-      cv: 'Mon CV (PDF)',
+  intranet: {
+    label: 'Intranet',
+    title: 'Un intranet pour 130 collaborateurs.',
+    titleMuted: 'Construit seul, de la base à la production.',
+    lead: 'Chez Cerfrance Lot, un cabinet comptable, j’ai tout pris en main : la modélisation MySQL, le code Symfony, les tests et la mise en production.',
+    points: [
+      { term: 'Back-end', value: 'PHP 8, Symfony, Doctrine, Twig' },
+      { term: 'Données', value: 'Une base MySQL relationnelle complexe' },
+      { term: 'Qualité', value: 'Tests PHPUnit dans GitLab CI/CD' },
+      { term: 'Portée', value: 'Des outils au service de 3 000 adhérents' },
+    ],
+    diagram: {
+      alt: 'L’intranet relie le suivi de production, les statistiques d’écritures, les devis clients, le pesage de dossiers, la FAQ et les actualités.',
+      center: 'Intranet',
+      spokes: spokes([
+        'Suivi de production',
+        'Statistiques d’écritures',
+        'Devis clients',
+        'Pesage de dossiers',
+        'FAQ et actualités',
+      ]),
     },
   },
-  education: [
-    {
-      period: '2023 — 2025',
-      degree: 'Master Ingénierie Logicielle',
-      school: 'IPI Blagnac (IGENSIA)',
-      description:
-        'Développement full-stack, architecture, tests, CI/CD, DevOps (Docker, Ansible, Terraform, AWS) et méthodes agiles.',
-    },
-    {
-      period: '2022 — 2023',
-      degree: 'Licence pro APSIO — Analyste programmeur',
-      school: 'IUT de Blagnac',
-    },
-    {
-      period: '2020 — 2022',
-      degree: 'DUT Informatique',
-      school: 'IUT Paul Sabatier',
-    },
-  ],
-  languages: ['Français — langue maternelle', 'Anglais — courant (TOEIC 795/990)'],
-  about: [
-    'Développeur web full-stack depuis 4 ans chez Cerfrance Lot, un cabinet comptable. J’ai conçu et je fais évoluer seul un intranet utilisé par 130 collaborateurs, avec une base MySQL complexe et des tests automatisés.',
-    'Mon socle est PHP/Symfony ; côté front, je travaille avec Angular, TypeScript et Tailwind CSS, et j’ai aussi pratiqué React et Vue.js.',
-    'À l’aise en environnement agile, je participe aux cérémonies Scrum et j’en anime ponctuellement. Je cherche une équipe où approfondir l’architecture et la qualité logicielle.',
-  ],
-  skills: skillsFor('fr'),
-  timeline: [
-    {
-      period: 'Depuis juil. 2026',
-      title: 'Développeur Web Full-Stack',
-      org: 'Cerfrance Lot — CDI',
-      description:
-        'Évolution de l’intranet et des outils métiers : nouvelles fonctionnalités Symfony, tests automatisés et participation aux cérémonies Scrum.',
-    },
-    {
-      period: 'Sept. 2025 — juin 2026',
-      title: 'Développeur Web Full-Stack',
-      org: 'Cerfrance Lot — CDD (sept.–déc. 2025, avr.–juin 2026)',
-      description:
-        'Fonctionnalités métier avec Symfony et JavaScript : suivi de production comptable, statistiques d’écritures, FAQ, actualités, génération de devis clients. Tests unitaires et d’intégration, participation et animation ponctuelle des cérémonies Scrum.',
-    },
-    {
-      period: '2023 — 2025',
-      title: 'Développeur Web Full-Stack',
-      org: 'Cerfrance Lot — Alternance',
-      description:
-        'Conception from scratch d’un intranet d’entreprise (Symfony, PHP 8, Doctrine, Twig, Tailwind CSS) utilisé par 130 collaborateurs, de la modélisation de la base à la mise en production. Outils métiers au service de 3 000 adhérents, tests PHPUnit exécutés dans une pipeline GitLab CI/CD.',
-    },
-    {
-      period: '2022 — 2023',
-      title: 'Développeur Web',
-      org: 'Cerfrance Lot — Alternance',
-      description:
-        'Reprise et modernisation d’un intranet historique sans framework (HTML, PHP, JavaScript) : restructuration de l’architecture, maintenabilité et performances. Développement d’un nouvel outil interne.',
-    },
-  ],
-  projects: [
-    {
-      title: 'Intranet Cerfrance',
-      description:
-        'Intranet complet pour 130 collaborateurs : suivi de production comptable, statistiques d’écritures, devis clients, FAQ et actualités. Base MySQL relationnelle complexe, tests unitaires et d’intégration dans la CI.',
-      role: 'Conception et développement en autonomie, de la base de données à la mise en production.',
-      tags: ['Symfony', 'PHP 8', 'Doctrine', 'MySQL', 'Tailwind CSS', 'GitLab CI'],
-      status: 'private',
-    },
-    {
-      title: 'Outil de pesage de dossiers',
-      description:
-        'Mesure de la charge de travail comptable : temps de traitement par dossier, indicateurs de productivité et statistiques globales pour les comptables et leurs managers.',
-      role: 'Recueil du besoin avec les équipes métier, développement et mise en production.',
-      tags: ['Symfony', 'PHP', 'MySQL', 'JavaScript'],
-      status: 'private',
-    },
-    {
-      title: 'Modernisation d’un intranet legacy',
-      description:
-        'Reprise d’un intranet historique écrit sans framework : nouvelle architecture, code plus maintenable et meilleures performances, puis un nouvel outil interne développé from scratch.',
-      role: 'Analyse de l’existant, refonte progressive sans interrompre le service.',
-      tags: ['PHP', 'JavaScript', 'HTML/CSS'],
-      status: 'private',
-    },
-    {
-      title: 'Fighter Stats',
-      description:
-        'Application sur l’UFC : classements, statistiques des combattants et catégories de poids, avec une interface responsive.',
-      role: 'Développement front Angular et gestion de projet en Scrum/Kanban.',
-      tags: ['Angular', 'TypeScript', 'Tailwind CSS'],
-      status: 'school',
-    },
-  ],
-  footer: { builtWith: 'Développé avec Angular & Tailwind CSS' },
+  statement: {
+    label: 'Ma façon de travailler',
+    before:
+      'Je préfère un outil simple que les équipes ouvrent',
+    strong: 'chaque jour',
+    after:
+      'à une démo brillante que personne n’utilise. Alors j’écoute le métier, je teste, puis je livre par petites étapes.',
+  },
+  projects: {
+    label: 'Projets',
+    title: 'Trois autres projets, deux en interne.',
+    roleLabel: 'Mon rôle',
+    toolsLabel: 'Outils :',
+    items: [
+      {
+        title: 'Outil de pesage de dossiers',
+        kind: 'Projet interne, Cerfrance Lot',
+        description:
+          'Il mesure la charge de travail comptable : temps par dossier, indicateurs de productivité et statistiques pour les managers.',
+        role: 'Recueil du besoin avec les équipes, développement, mise en production.',
+        tools: [T.symfony, T.mysql, T.php],
+      },
+      {
+        title: 'Modernisation d’un intranet legacy',
+        kind: 'Projet interne, Cerfrance Lot',
+        description:
+          'Un intranet historique écrit sans framework : nouvelle architecture, code maintenable, meilleures performances, sans couper le service.',
+        role: 'Analyse de l’existant et refonte progressive.',
+        tools: [T.php, T.mysql, T.git],
+      },
+      {
+        title: 'Fighter Stats',
+        kind: 'Projet de formation',
+        description:
+          'Une application sur l’UFC : classements, statistiques des combattants et catégories de poids, sur mobile comme sur ordinateur.',
+        role: 'Front Angular et gestion de projet en Scrum.',
+        tools: [T.angular, T.typescript, T.tailwind],
+      },
+    ],
+  },
+  path: {
+    label: 'Parcours',
+    title: 'Quatre ans chez Cerfrance Lot, de l’alternance au CDI.',
+    work: 'Expérience',
+    education: 'Formation',
+    languages: 'Langues',
+    jobs: [
+      { period: 'Depuis juil. 2026', title: 'Développeur web full-stack', org: 'CDI' },
+      { period: '2025 — 2026', title: 'Développeur web full-stack', org: 'CDD, sept.–déc. puis avr.–juin' },
+      { period: '2023 — 2025', title: 'Création de l’intranet', org: 'Alternance' },
+      { period: '2022 — 2023', title: 'Modernisation de l’intranet legacy', org: 'Alternance' },
+    ],
+    schools: [
+      { period: '2023 — 2025', title: 'Master Ingénierie Logicielle', org: 'IPI Blagnac' },
+      { period: '2022 — 2023', title: 'Licence pro APSIO', org: 'IUT de Blagnac' },
+      { period: '2020 — 2022', title: 'DUT Informatique', org: 'IUT Paul Sabatier' },
+    ],
+    spoken: [
+      { term: 'Français', value: 'Langue maternelle' },
+      { term: 'Anglais', value: 'Courant, TOEIC 795/990' },
+    ],
+  },
+  stack: {
+    label: 'Compétences',
+    title: 'Ma stack, couche par couche.',
+    titleMuted: 'De l’interface à la mise en production.',
+    methods: 'Scrum et Kanban au quotidien. Je participe aux cérémonies et j’en anime certaines.',
+    request: 'requête',
+    response: 'réponse',
+    layers: layersFor('fr'),
+  },
+  close: {
+    title: 'Télécharger mon CV',
+    lead: 'Ou écrivez-moi à l’adresse ci-dessous : je réponds à chaque message.',
+  },
+  footer: {
+    lede: 'Développeur web full-stack à Toulouse.',
+    contact: 'Contact',
+    sections: 'Sur cette page',
+    trademarks: 'Les noms et logos de produits appartiennent à leurs propriétaires.',
+    built: 'Site construit avec Angular et Tailwind CSS.',
+  },
 };
 
 const EN: PortfolioContent = {
   ...SHARED,
-  roles: ['Full-Stack Web Developer', 'Symfony · Angular'],
-  tagline:
-    'I build reliable intranets and business tools, from the database to the interface, with Symfony and Angular.',
-  location: 'Toulouse, France',
-  availability: 'Permanent role · open to opportunities',
   meta: {
     title: 'Julien Devienne-Ousmer — Full-Stack Web Developer (Symfony, Angular)',
     description:
-      'Portfolio of Julien Devienne-Ousmer, full-stack web developer in Toulouse, France: PHP/Symfony, Angular, TypeScript, MySQL. 4 years of experience, Master’s in Software Engineering.',
+      'Full-stack web developer in Toulouse, France: I built the Cerfrance Lot intranet on my own, used by 130 employees. PHP/Symfony, Angular, MySQL, Master’s in Software Engineering.',
   },
-  photoAlt: 'Photo of Julien Devienne-Ousmer',
+  skip: 'Skip to content',
   nav: [
-    { id: 'hero', label: 'Home' },
-    { id: 'experience', label: 'Experience' },
-    { id: 'projects', label: 'Projects' },
-    { id: 'about', label: 'About' },
-    { id: 'skills', label: 'Skills' },
-    { id: 'contact', label: 'Contact' },
+    { id: 'intranet', label: 'Intranet' },
+    { id: 'projets', label: 'Projects' },
+    { id: 'parcours', label: 'Career' },
+    { id: 'stack', label: 'Skills' },
   ],
+  ui: {
+    menu: 'Menu',
+    langLabel: 'Language',
+    themeToDark: 'Switch to dark theme',
+    themeToLight: 'Switch to light theme',
+  },
+  photoAlt: 'Julien Devienne-Ousmer in a white T-shirt, smiling at the camera',
   hero: {
+    notice: 'In a permanent role at Cerfrance Lot, open to a new position',
+    title: 'Full-stack web developer in Toulouse',
+    lead: 'I build intranets and business tools with Symfony and Angular. I built the latest one on my own: 130 employees open it every day.',
     ctaCv: 'Download my CV',
     ctaContact: 'Get in touch',
+    floats: [
+      { live: 'Permanent', when: 'Since July 2026', title: 'Full-stack developer, Cerfrance Lot' },
+      { live: 'Intranet', when: 'Every day', title: 'Used by 130 employees' },
+      { live: 'Quality', when: 'On every push', title: 'PHPUnit tests in GitLab CI' },
+    ],
+    facts: [
+      { term: 'Experience', value: '4 years in industry' },
+      { term: 'Degree', value: 'Master’s in Software Engineering' },
+      { term: 'English', value: 'Fluent, TOEIC 795' },
+    ],
   },
-  stats: [
-    { value: '4 yrs', label: 'of industry experience' },
-    { value: '130', label: 'employees use my intranet' },
-    { value: 'MSc', label: 'Software Engineering' },
-  ],
-  sections: {
-    about: { label: 'About', title: 'Who am I?', languages: 'Languages' },
-    skills: { label: 'Skills', title: 'Stack & methods' },
-    experience: {
-      label: 'Experience',
-      title: 'Professional experience',
-      intro:
-        'At Cerfrance Lot since 2022, from work-study to a permanent role: modernising a legacy intranet, then designing a new intranet and business tools.',
-    },
-    projects: {
-      label: 'Projects',
-      title: 'Selected work',
-      private: 'Internal project',
-      school: 'School project',
-      role: 'My role',
-    },
-    education: { label: 'Education' },
-    contact: {
-      label: 'Contact',
-      title: "Let's work together",
-      intro: 'A role, a project or just a chat? Drop me a line, I reply quickly.',
-      cv: 'My CV (PDF, French)',
+  intranet: {
+    label: 'Intranet',
+    title: 'An intranet for 130 employees.',
+    titleMuted: 'Built on my own, from database to production.',
+    lead: 'At Cerfrance Lot, an accounting firm, I owned all of it: the MySQL model, the Symfony code, the tests and the release to production.',
+    points: [
+      { term: 'Back end', value: 'PHP 8, Symfony, Doctrine, Twig' },
+      { term: 'Data', value: 'A complex relational MySQL database' },
+      { term: 'Quality', value: 'PHPUnit tests in GitLab CI/CD' },
+      { term: 'Reach', value: 'Tools serving 3,000 client members' },
+    ],
+    diagram: {
+      alt: 'The intranet links production tracking, entry statistics, client quotes, workload weighing, the FAQ and the news.',
+      center: 'Intranet',
+      spokes: spokes([
+        'Production tracking',
+        'Entry statistics',
+        'Client quotes',
+        'Workload weighing',
+        'FAQ and news',
+      ]),
     },
   },
-  education: [
-    {
-      period: '2023 — 2025',
-      degree: 'Master’s in Software Engineering',
-      school: 'IPI Blagnac (IGENSIA)',
-      description:
-        'Full-stack development, architecture, testing, CI/CD, DevOps (Docker, Ansible, Terraform, AWS) and agile methods.',
-    },
-    {
-      period: '2022 — 2023',
-      degree: 'Professional Bachelor’s — Software Analyst Programmer',
-      school: 'IUT de Blagnac',
-    },
-    {
-      period: '2020 — 2022',
-      degree: 'Two-year Technical Degree in Computer Science (DUT)',
-      school: 'IUT Paul Sabatier',
-    },
-  ],
-  languages: ['French — native', 'English — fluent (TOEIC 795/990)'],
-  about: [
-    'Full-stack web developer for 4 years at Cerfrance Lot, an accounting firm. I designed, and still evolve on my own, an intranet used by 130 employees, backed by a complex MySQL database and automated tests.',
-    'My core is PHP/Symfony; on the front end I work with Angular, TypeScript and Tailwind CSS, and I have also used React and Vue.js.',
-    'Comfortable in agile teams: I take part in Scrum ceremonies and facilitate some of them. I am looking for a team where I can go deeper into software architecture and quality.',
-  ],
-  skills: skillsFor('en'),
-  timeline: [
-    {
-      period: 'Since Jul 2026',
-      title: 'Full-Stack Web Developer',
-      org: 'Cerfrance Lot — Permanent',
-      description:
-        'Evolving the intranet and business tools: new Symfony features, automated tests and Scrum ceremonies.',
-    },
-    {
-      period: 'Sep 2025 — Jun 2026',
-      title: 'Full-Stack Web Developer',
-      org: 'Cerfrance Lot — Fixed-term (Sep–Dec 2025, Apr–Jun 2026)',
-      description:
-        'Business features with Symfony and JavaScript: accounting production tracking, accounting entry statistics, FAQ, news, client quote generation. Unit and integration tests; took part in and occasionally facilitated Scrum ceremonies.',
-    },
-    {
-      period: '2023 — 2025',
-      title: 'Full-Stack Web Developer',
-      org: 'Cerfrance Lot — Work-study',
-      description:
-        'Designed a company intranet from scratch (Symfony, PHP 8, Doctrine, Twig, Tailwind CSS) used by 130 employees, from database modelling to production. Business tools serving 3,000 client members, PHPUnit tests running in a GitLab CI/CD pipeline.',
-    },
-    {
-      period: '2022 — 2023',
-      title: 'Web Developer',
-      org: 'Cerfrance Lot — Work-study',
-      description:
-        'Took over and modernised a framework-less legacy intranet (HTML, PHP, JavaScript): restructured the architecture, improved maintainability and performance. Built a new internal tool.',
-    },
-  ],
-  projects: [
-    {
-      title: 'Cerfrance Intranet',
-      description:
-        'Full intranet for 130 employees: accounting production tracking, accounting entry statistics, client quotes, FAQ and news. Complex relational MySQL database, unit and integration tests in CI.',
-      role: 'Designed and built it on my own, from the database to production.',
-      tags: ['Symfony', 'PHP 8', 'Doctrine', 'MySQL', 'Tailwind CSS', 'GitLab CI'],
-      status: 'private',
-    },
-    {
-      title: 'Accounting Workload Tool',
-      description:
-        'Measures accounting workload: processing time per client file, productivity indicators and overall statistics for accountants and their managers.',
-      role: 'Gathered needs with business teams, built and shipped it.',
-      tags: ['Symfony', 'PHP', 'MySQL', 'JavaScript'],
-      status: 'private',
-    },
-    {
-      title: 'Legacy Intranet Modernisation',
-      description:
-        'Took over a framework-less legacy intranet: new architecture, more maintainable code and better performance, then a brand-new internal tool built from scratch.',
-      role: 'Analysed the existing code and refactored it step by step without service interruption.',
-      tags: ['PHP', 'JavaScript', 'HTML/CSS'],
-      status: 'private',
-    },
-    {
-      title: 'Fighter Stats',
-      description: 'UFC app: rankings, fighter statistics and weight classes, with a responsive interface.',
-      role: 'Angular front-end development and project management with Scrum/Kanban.',
-      tags: ['Angular', 'TypeScript', 'Tailwind CSS'],
-      status: 'school',
-    },
-  ],
-  footer: { builtWith: 'Built with Angular & Tailwind CSS' },
+  statement: {
+    label: 'How I work',
+    before: 'I would rather ship a simple tool that teams open',
+    strong: 'every day',
+    after:
+      'than a brilliant demo nobody uses. So I listen to the business, I test, and I deliver in small steps.',
+  },
+  projects: {
+    label: 'Projects',
+    title: 'Three more projects, two in-house.',
+    roleLabel: 'My role',
+    toolsLabel: 'Tools:',
+    items: [
+      {
+        title: 'Accounting workload tool',
+        kind: 'Internal project, Cerfrance Lot',
+        description:
+          'It measures accounting workload: time per client file, productivity indicators and statistics for managers.',
+        role: 'Gathered needs with the teams, built it and shipped it.',
+        tools: [T.symfony, T.mysql, T.php],
+      },
+      {
+        title: 'Legacy intranet modernisation',
+        kind: 'Internal project, Cerfrance Lot',
+        description:
+          'A framework-less legacy intranet: new architecture, maintainable code, better performance, with no service downtime.',
+        role: 'Analysed the existing code and refactored it step by step.',
+        tools: [T.php, T.mysql, T.git],
+      },
+      {
+        title: 'Fighter Stats',
+        kind: 'School project',
+        description:
+          'An app about the UFC: rankings, fighter statistics and weight classes, on phone and desktop alike.',
+        role: 'Angular front end and Scrum project management.',
+        tools: [T.angular, T.typescript, T.tailwind],
+      },
+    ],
+  },
+  path: {
+    label: 'Career',
+    title: 'Four years at Cerfrance Lot, from work-study to a permanent role.',
+    work: 'Experience',
+    education: 'Education',
+    languages: 'Languages',
+    jobs: [
+      { period: 'Since Jul 2026', title: 'Full-stack web developer', org: 'Permanent' },
+      { period: '2025 — 2026', title: 'Full-stack web developer', org: 'Fixed-term, Sep–Dec then Apr–Jun' },
+      { period: '2023 — 2025', title: 'Built the intranet', org: 'Work-study' },
+      { period: '2022 — 2023', title: 'Modernised the legacy intranet', org: 'Work-study' },
+    ],
+    schools: [
+      { period: '2023 — 2025', title: 'Master’s in Software Engineering', org: 'IPI Blagnac' },
+      { period: '2022 — 2023', title: 'Professional Bachelor’s, APSIO', org: 'IUT de Blagnac' },
+      { period: '2020 — 2022', title: 'Technical degree in Computer Science', org: 'IUT Paul Sabatier' },
+    ],
+    spoken: [
+      { term: 'French', value: 'Native' },
+      { term: 'English', value: 'Fluent, TOEIC 795/990' },
+    ],
+  },
+  stack: {
+    label: 'Skills',
+    title: 'My stack, layer by layer.',
+    titleMuted: 'From the interface to production.',
+    methods: 'Scrum and Kanban day to day. I take part in the ceremonies and facilitate some of them.',
+    request: 'request',
+    response: 'response',
+    layers: layersFor('en'),
+  },
+  close: {
+    title: 'Download my CV',
+    lead: 'Or write to me at the address below: I answer every message.',
+  },
+  footer: {
+    lede: 'Full-stack web developer in Toulouse, France.',
+    contact: 'Contact',
+    sections: 'On this page',
+    trademarks: 'Product names and logos are trademarks of their owners.',
+    built: 'Built with Angular and Tailwind CSS.',
+  },
 };
 
 export const PORTFOLIO_I18N: Record<Lang, PortfolioContent> = { fr: FR, en: EN };
