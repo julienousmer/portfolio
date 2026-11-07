@@ -1,274 +1,244 @@
-<div class="portfolio relative min-h-screen overflow-x-hidden bg-surface text-content">
-  <!-- Subtle ambient -->
-  <div class="pointer-events-none fixed inset-0 -z-10" aria-hidden="true">
-    <div class="ambient-glow ambient-glow--violet"></div>
-    <div class="ambient-glow ambient-glow--blue"></div>
-    <div class="grid-bg"></div>
-  </div>
+<!--
+  deal: hero split · palette stone-blueprint · type host (Host Grotesk) · radius soft · nav nav-centre ·
+  footer footer-columns · close close-type · rhythm space · buttons arrow · mark JDO monogram (brand/, concept B) ·
+  moments picture-develops (hero photo) and word-highlight (#facon) · light by default, dark on the toggle
+-->
+@let c = content();
 
-  <!-- Sticky navbar -->
-  <header
-    class="navbar"
-    [class.navbar--scrolled]="navScrolled()"
-    @fadeIn
-  >
-    <nav class="navbar__inner">
-      <button type="button" (click)="scrollTo('hero')" class="logo">
-        J<span class="text-accent-violet">.</span>O
-      </button>
-
-      <ul class="navbar__links hidden md:flex">
-        @for (link of content().nav; track link.id) {
-          <li>
-            <button
-              type="button"
-              (click)="scrollTo(link.id)"
-              class="nav-link"
-              [class.nav-link--active]="activeSection() === link.id"
-              [class.nav-link--featured]="isFeaturedSection(link.id)"
-            >
-              {{ link.label }}
-            </button>
-          </li>
-        }
-      </ul>
-
-      <div class="navbar__actions">
-        <div class="lang-switch" role="group" [attr.aria-label]="lang() === 'fr' ? 'Langue' : 'Language'">
-          <button
-            type="button"
-            class="lang-switch__btn"
-            [class.lang-switch__btn--active]="lang() === 'fr'"
-            (click)="setLang('fr')"
-          >
-            FR
-          </button>
-          <button
-            type="button"
-            class="lang-switch__btn"
-            [class.lang-switch__btn--active]="lang() === 'en'"
-            (click)="setLang('en')"
-          >
-            EN
-          </button>
-        </div>
-        <button
-          type="button"
-          class="icon-btn md:hidden"
-          (click)="toggleMenu()"
-          [attr.aria-expanded]="menuOpen()"
-          aria-label="Menu"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
-            @if (menuOpen()) {
-              <path d="M18 6 6 18M6 6l12 12"/>
-            } @else {
-              <path d="M4 8h16M4 16h16"/>
-            }
-          </svg>
-        </button>
-      </div>
+<header class="nav nav--centre">
+  <div class="wrap nav__bar">
+    <a class="skip-link" href="#top">{{ c.skip }}</a>
+    <a class="nav__logo" href="#top"><svg class="jdo" viewBox="0 0 28 30" aria-hidden="true"><path class="jdo__ink" d="M6 0h6v22a8 8 0 0 1-8 8H0v-6h4a2 2 0 0 0 2-2z"/><path class="jdo__ink" d="M14 0h7a7 7 0 0 1 0 14h-7z"/><path class="jdo__accent" fill-rule="evenodd" d="M21 16a7 7 0 1 1 0 14a7 7 0 0 1 0-14zm0 5a2 2 0 1 0 0 4a2 2 0 0 0 0-4z"/></svg>{{ c.name }}</a>
+    <nav class="nav__links" aria-label="Main">
+      @for (item of c.nav; track $index) {
+        <div class="nav__item"><a class="nav__link" [href]="'#' + item.id">{{ item.label }}</a></div>
+      }
     </nav>
-
-    @if (menuOpen()) {
-      <div class="navbar__mobile" @fadeInUp>
-        <ul>
-          @for (link of content().nav; track link.id) {
-            <li>
-              <button type="button" (click)="scrollTo(link.id)" class="navbar__mobile-link">
-                {{ link.label }}
-              </button>
-            </li>
-          }
-        </ul>
+    <div class="nav__actions">
+      <div class="seg" role="group" [attr.aria-label]="c.ui.langLabel">
+        <button type="button" class="seg__btn" [attr.aria-pressed]="lang() === 'fr'" (click)="setLang('fr')" lang="fr">FR</button>
+        <button type="button" class="seg__btn" [attr.aria-pressed]="lang() === 'en'" (click)="setLang('en')" lang="en">EN</button>
       </div>
-    }
-  </header>
+      <button
+        type="button"
+        class="theme-btn"
+        (click)="toggleTheme()"
+        [attr.aria-label]="theme() === 'dark' ? c.ui.themeToLight : c.ui.themeToDark"
+        [attr.title]="theme() === 'dark' ? c.ui.themeToLight : c.ui.themeToDark"
+      >
+        @if (theme() === 'dark') {
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        } @else {
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+        }
+      </button>
+      <a class="btn btn--primary" [href]="c.cvPath" download>{{ c.hero.ctaCv }}</a>
+    </div>
+    <button class="nav__toggle" type="button" aria-expanded="false" [attr.aria-label]="c.ui.menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
 
-  <main class="main">
-    <!-- Hero -->
-    <section id="hero" class="hero" @heroSequence>
-      <div class="hero__grid">
-        <div class="hero__content">
-          <p class="hero-line eyebrow">{{ content().roles.join(' · ') }}</p>
-          <h1 class="hero-line hero__title">{{ content().name }}</h1>
-          <div class="hero-line hero-accent"></div>
-          <p class="hero-line hero__tagline">{{ content().tagline }}</p>
-
-          <div class="hero-line hero__ctas">
-            <a [href]="content().cvPath" download class="btn-primary">{{ content().hero.ctaCv }}</a>
-            <button type="button" (click)="scrollTo('contact')" class="btn-secondary">
-              {{ content().hero.ctaContact }}
-            </button>
+<main id="top">
+  <section class="hero hero--split" data-enter aria-labelledby="hero-h">
+    <div class="wrap">
+      <div class="hero-text grid hero__grid">
+        <div class="hero__text hero-copy span-5">
+          <p class="hero-notice"><span class="dot" aria-hidden="true"></span>{{ c.hero.notice }}</p>
+          <h1 id="hero-h">{{ c.hero.title }}</h1>
+          <p class="hero__lead">{{ c.hero.lead }}</p>
+          <div class="btn-row">
+            <a class="btn btn--primary" [href]="c.cvPath" download>{{ c.hero.ctaCv }}<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+            <a class="btn btn--secondary" [href]="'mailto:' + c.email">{{ c.hero.ctaContact }}</a>
           </div>
-
-          <div class="hero-line hero__stats">
-            @for (stat of content().stats; track $index) {
-              <div class="stat">
-                <span class="stat__value">{{ stat.value }}</span>
-                <span class="stat__label">{{ stat.label }}</span>
+          <dl class="hero-facts">
+            @for (f of c.hero.facts; track $index) {
+              <div><dt>{{ f.term }}</dt><dd>{{ f.value }}</dd></div>
+            }
+          </dl>
+        </div>
+        <div class="hero__media span-5 start-8" data-moment="picture-develops">
+          <picture>
+            <source [srcset]="photo.webp" type="image/webp" />
+            <img [src]="photo.jpg" [alt]="c.photoAlt" width="640" height="640" fetchpriority="high" style="--ly-pos: 50% 35%" />
+          </picture>
+          <div class="ly-float float-cycle" aria-live="off">
+            @for (f of c.hero.floats; track $index) {
+              <div class="float-cycle__item" [class.is-on]="$index === floatIndex()" [attr.aria-hidden]="$index !== floatIndex()">
+                <div class="ly-float__row"><span class="ly-live">{{ f.live }}</span><span>{{ f.when }}</span></div>
+                <div class="ly-float__title">{{ f.title }}</div>
               </div>
             }
           </div>
-
-          <div class="hero-line hero__meta">
-            <span class="status">
-              <span class="status__dot"></span>
-              {{ content().availability }}
-            </span>
-            <span class="text-content-muted">{{ content().location }}</span>
-          </div>
-        </div>
-
-        <div class="hero-line hero__visual">
-          <div class="avatar-wrap">
-            <div class="avatar-ring" aria-hidden="true"></div>
-            <picture>
-              <source [srcset]="photo.webp" type="image/webp" />
-              <img [src]="photo.jpg" [alt]="content().photoAlt" width="640" height="640" class="avatar-img" />
-            </picture>
-          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Experience (featured) -->
-    <section id="experience" class="section section--featured">
-      <div #reveal class="reveal section__head">
-        <span class="section__label">{{ content().sections.experience.label }}</span>
-        <h2 class="section__title">{{ content().sections.experience.title }}</h2>
-        <p class="section__desc">{{ content().sections.experience.intro }}</p>
-      </div>
-
-      <ol class="timeline">
-        @for (item of content().timeline; track item.title + item.period; let i = $index) {
-          <li
-            #reveal
-            class="reveal timeline__item"
-            [style.--delay]="i"
-          >
-            <div class="timeline__marker" aria-hidden="true"></div>
-            <article class="card timeline__card">
-              <time class="timeline__date">{{ item.period }}</time>
-              <h3 class="timeline__role">{{ item.title }}</h3>
-              <p class="timeline__org">{{ item.org }}</p>
-              <p class="timeline__text">{{ item.description }}</p>
-            </article>
-          </li>
-        }
-      </ol>
-    </section>
-
-    <!-- Projects (featured) -->
-    <section id="projects" class="section section--featured">
-      <div #reveal class="reveal section__head">
-        <span class="section__label">{{ content().sections.projects.label }}</span>
-        <h2 class="section__title">{{ content().sections.projects.title }}</h2>
-      </div>
-
-      <div class="projects-grid">
-        @for (project of content().projects; track project.title; let i = $index) {
-          <article
-            #reveal
-            class="reveal card project-card"
-            [style.--delay]="i"
-          >
-            <div class="project-card__top">
-              <span class="badge">{{ projectStatusLabel(project.status) }}</span>
-              <span class="project-card__index">0{{ i + 1 }}</span>
-            </div>
-            <h3 class="project-card__title">{{ project.title }}</h3>
-            <p class="project-card__desc">{{ project.description }}</p>
-            <p class="project-card__role">
-              <span>{{ content().sections.projects.role }} :</span> {{ project.role }}
-            </p>
-            <ul class="project-card__tags">
-              @for (tag of project.tags; track tag) {
-                <li>{{ tag }}</li>
-              }
-            </ul>
-          </article>
-        }
-      </div>
-    </section>
-
-    <!-- About -->
-    <section id="about" class="section">
-      <div #reveal class="reveal section__head">
-        <span class="section__label">{{ content().sections.about.label }}</span>
-        <h2 class="section__title">{{ content().sections.about.title }}</h2>
-      </div>
-
-      <div class="about-grid">
-        <div #reveal class="reveal about__text">
-          @for (paragraph of content().about; track $index) {
-            <p>{{ paragraph }}</p>
+  <section class="section" id="intranet" aria-labelledby="intranet-h">
+    <div class="wrap grid grid--middle">
+      <div class="span-5 stack-6">
+        <div class="section-head">
+          <p class="t-label muted">{{ c.intranet.label }}</p>
+          <h2 id="intranet-h">{{ c.intranet.title }} <span class="muted">{{ c.intranet.titleMuted }}</span></h2>
+          <p>{{ c.intranet.lead }}</p>
+        </div>
+        <dl class="rows">
+          @for (p of c.intranet.points; track $index) {
+            <div class="rows__row"><dt>{{ p.term }}</dt><dd>{{ p.value }}</dd></div>
           }
+        </dl>
+      </div>
+      <div class="span-6 start-7">
+        <div class="panel intranet-panel">
+          <div class="dg" [attr.data-diagram]="diagramSpec()" role="img" [attr.aria-label]="c.intranet.diagram.alt"></div>
         </div>
-        <div #reveal class="reveal about__aside" @scaleIn>
-          <article class="card">
-            <h3 class="aside__title">{{ content().sections.education.label }}</h3>
-            <ol class="education-list">
-              @for (edu of content().education; track $index) {
-                <li>
-                  <p class="education-list__degree">{{ edu.degree }}</p>
-                  <p class="education-list__meta">{{ edu.school }} · {{ edu.period }}</p>
-                  @if (edu.description) {
-                    <p class="education-list__desc">{{ edu.description }}</p>
-                  }
-                </li>
-              }
-            </ol>
-            <h3 class="aside__title mt-6">{{ content().sections.about.languages }}</h3>
-            <ul class="mt-3 space-y-1 text-sm text-content-secondary">
-              @for (language of content().languages; track $index) {
-                <li>{{ language }}</li>
-              }
-            </ul>
-          </article>
-        </div>
+      </div>
+    </div>
+  </section>
+
+  @for (k of langKey(); track k) {
+    <section class="section statement" id="facon" data-moment="word-highlight" [attr.aria-label]="c.statement.label">
+      <div class="wrap">
+        <p class="t-label muted">{{ c.statement.label }}</p>
+        <p class="mo-wh__text">{{ c.statement.before }} <strong>{{ c.statement.strong }}</strong> {{ c.statement.after }}</p>
       </div>
     </section>
+  }
 
-    <!-- Skills -->
-    <section id="skills" class="section">
-      <div #reveal class="reveal section__head">
-        <span class="section__label">{{ content().sections.skills.label }}</span>
-        <h2 class="section__title">{{ content().sections.skills.title }}</h2>
+  <section class="section" id="projets" style="--hm: 2" aria-labelledby="projets-h">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="t-label muted">{{ c.projects.label }}</p>
+        <h2 id="projets-h">{{ c.projects.title }}</h2>
       </div>
-
-      <div class="skills-grid" @staggerList>
-        @for (group of content().skills; track $index) {
-          <article class="card skill-card">
-            <h3>{{ group.title }}</h3>
-            <ul>
-              @for (skill of group.items; track skill) {
-                <li><span class="pill" [class.pill--accent]="group.accent">{{ skill }}</span></li>
+      <div class="grid projects" data-reveal>
+        @for (p of c.projects.items; track $index) {
+          <article class="project span-4" data-spot [style.--i]="$index">
+            <div class="project__panel" role="img" [attr.aria-label]="toolLabel(p.tools)">
+              @for (t of p.tools; track $index) {
+                <span class="ic-tile ic-tile--72" [class.ic-tile--wide]="t.wide" [style.--t]="$index"><img class="ic" [src]="'assets/icons/' + t.icon + '.svg'" alt="" width="40" height="40" /></span>
               }
-            </ul>
+            </div>
+            <p class="t-small muted">{{ p.kind }}</p>
+            <h3 class="project__title">{{ p.title }}</h3>
+            <p class="project__text">{{ p.description }}</p>
+            <p class="project__role"><span class="muted">{{ c.projects.roleLabel }}.</span> {{ p.role }}</p>
           </article>
         }
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Contact -->
-    <section id="contact" class="section">
-      <div #reveal class="reveal card contact-card">
-        <span class="section__label">{{ content().sections.contact.label }}</span>
-        <h2 class="section__title mt-3">{{ content().sections.contact.title }}</h2>
-        <p class="mt-4 max-w-md text-content-secondary">{{ content().sections.contact.intro }}</p>
-        <div class="contact-card__actions">
-          <a [href]="'mailto:' + content().email" class="btn-primary">{{ content().email }}</a>
-          <a [href]="content().cvPath" download class="btn-secondary">{{ content().sections.contact.cv }}</a>
-          <a [href]="content().github" target="_blank" rel="noopener noreferrer" class="btn-secondary">GitHub</a>
-          <a [href]="content().linkedin" target="_blank" rel="noopener noreferrer" class="btn-ghost">LinkedIn</a>
+  <section class="section" id="parcours" aria-labelledby="parcours-h">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="t-label muted">{{ c.path.label }}</p>
+        <h2 id="parcours-h">{{ c.path.title }}</h2>
+      </div>
+      <div class="grid">
+        <div class="span-6">
+          <p class="col-title">{{ c.path.work }}</p>
+          <ol class="timeline timeline--track" data-reveal>
+            @for (j of c.path.jobs; track $index) {
+              <li [class.is-now]="$first" [style.--i]="$index"><span class="timeline__when">{{ j.period }}</span><span class="timeline__what">{{ j.title }}<small>Cerfrance Lot · {{ j.org }}</small></span></li>
+            }
+          </ol>
+        </div>
+        <div class="span-6 start-7">
+          <p class="col-title">{{ c.path.education }}</p>
+          <ol class="timeline timeline--track" data-reveal>
+            @for (s of c.path.schools; track $index) {
+              <li [style.--i]="$index"><span class="timeline__when">{{ s.period }}</span><span class="timeline__what">{{ s.title }}<small>{{ s.org }}</small></span></li>
+            }
+          </ol>
+          <p class="col-title col-title--gap">{{ c.path.languages }}</p>
+          <dl class="timeline timeline--dl" data-reveal>
+            @for (l of c.path.spoken; track $index) {
+              <div><dt class="timeline__when">{{ l.term }}</dt><dd class="timeline__what">{{ l.value }}</dd></div>
+            }
+          </dl>
         </div>
       </div>
-    </section>
-  </main>
+    </div>
+  </section>
 
-  <footer class="footer">
-    <p>© {{ year }} {{ content().name }}</p>
-    <p>{{ content().footer.builtWith }}</p>
-  </footer>
-</div>
+  <section class="section" id="stack" style="--hm: 2" aria-labelledby="stack-h">
+    <div class="wrap">
+      <div class="section-head section-head--split">
+        <div>
+          <p class="t-label muted">{{ c.stack.label }}</p>
+          <h2 id="stack-h">{{ c.stack.title }} <span class="muted">{{ c.stack.titleMuted }}</span></h2>
+        </div>
+        <p class="stack-methods">{{ c.stack.methods }}</p>
+      </div>
+      <div class="layers">
+        <div class="layers__rail" aria-hidden="true">
+          <span class="layers__tag layers__tag--down">{{ c.stack.request }} ↓</span>
+          <span class="layers__pulse"></span>
+          <span class="layers__tag layers__tag--up">↑ {{ c.stack.response }}</span>
+        </div>
+        <ol class="layers__list">
+          @for (l of c.stack.layers; track $index) {
+            <li class="layer" data-spot [style.--i]="$index">
+              <div class="layer__head">
+                <h3 class="layer__name">{{ l.name }}</h3>
+                <p class="layer__note">{{ l.note }}</p>
+              </div>
+              <ul class="layer__tools">
+                @for (t of l.tools; track $index) {
+                  <li class="tool" tabindex="0">
+                    <span class="ic-tile ic-tile--40" [class.ic-tile--wide]="t.wide"><img class="ic" [src]="'assets/icons/' + t.icon + '.svg'" alt="" width="24" height="24" /></span>
+                    <span class="tool__name">{{ t.name }}</span>
+                    <span class="tool__meta" role="tooltip">{{ t.meta }}</span>
+                  </li>
+                }
+              </ul>
+            </li>
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer closing" id="contact" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--type">
+      <div class="section-head">
+        <h2 id="close-h">{{ c.close.title }}</h2>
+        <p class="t-lead">{{ c.close.lead }}</p>
+      </div>
+      <a class="btn btn--primary close__btn" [href]="c.cvPath" download>{{ c.hero.ctaCv }}<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-6 stack-5">
+          <a class="nav__logo" href="#top"><svg class="jdo" viewBox="0 0 28 30" aria-hidden="true"><path class="jdo__ink" d="M6 0h6v22a8 8 0 0 1-8 8H0v-6h4a2 2 0 0 0 2-2z"/><path class="jdo__ink" d="M14 0h7a7 7 0 0 1 0 14h-7z"/><path class="jdo__accent" fill-rule="evenodd" d="M21 16a7 7 0 1 1 0 14a7 7 0 0 1 0-14zm0 5a2 2 0 1 0 0 4a2 2 0 0 0 0-4z"/></svg>{{ c.name }}</a>
+          <p class="footer__lede">{{ c.footer.lede }}</p>
+        </div>
+        <div class="span-3 start-7 footer__col">
+          <h4>{{ c.footer.contact }}</h4>
+          <ul>
+            <li><a [href]="'mailto:' + c.email">{{ c.email }}</a></li>
+            <li><a [href]="c.linkedin" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+            <li><a [href]="c.github" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          </ul>
+        </div>
+        <div class="span-3 footer__col">
+          <h4>{{ c.footer.sections }}</h4>
+          <ul>
+            @for (item of c.nav; track $index) {
+              <li><a [href]="'#' + item.id">{{ item.label }}</a></li>
+            }
+          </ul>
+        </div>
+      </div>
+      <div class="footer__legal">
+        <span>&copy; {{ year }} {{ c.name }} · {{ c.footer.built }}</span>
+        <span>{{ c.footer.trademarks }}</span>
+      </div>
+    </div>
+  </div>
+</footer>
