@@ -242,10 +242,6 @@
     @apply absolute -left-[calc(1.5rem+5px)] top-7 h-2.5 w-2.5 rounded-full border-2 border-accent-violet bg-surface sm:-left-[calc(2rem+5px)];
   }
 
-  .timeline__item--edu .timeline__marker {
-    @apply border-accent-blue;
-  }
-
   .timeline__item.is-visible .timeline__marker {
     @apply scale-110 shadow-[0_0_12px_rgba(124,58,237,0.5)];
   }
@@ -296,11 +292,19 @@
   }
 
   .project-card__desc {
-    @apply mt-3 flex-1 text-sm leading-relaxed text-content-secondary;
+    @apply mt-3 text-sm leading-relaxed text-content-secondary;
+  }
+
+  .project-card__role {
+    @apply mt-3 text-sm leading-relaxed text-content-secondary;
+  }
+
+  .project-card__role span {
+    @apply font-medium text-content;
   }
 
   .project-card__tags {
-    @apply mt-5 flex flex-wrap gap-2;
+    @apply mt-auto flex flex-wrap gap-2 pt-5;
   }
 
   .project-card__tags li {
@@ -320,13 +324,33 @@
     @apply text-base leading-relaxed text-content-secondary;
   }
 
-  .card--education {
+  .about__aside {
     @apply lg:col-span-2;
+  }
+
+  .aside__title {
+    @apply text-xs font-semibold uppercase tracking-wider text-content-muted;
+  }
+
+  .education-list {
+    @apply mt-4 space-y-4;
+  }
+
+  .education-list__degree {
+    @apply text-sm font-semibold text-content;
+  }
+
+  .education-list__meta {
+    @apply mt-0.5 text-xs text-content-secondary;
+  }
+
+  .education-list__desc {
+    @apply mt-2 text-sm leading-relaxed text-content-secondary;
   }
 
   /* Skills */
   .skills-grid {
-    @apply grid gap-5 md:grid-cols-3;
+    @apply grid gap-5 md:grid-cols-2;
   }
 
   .skill-card h3 {
@@ -347,23 +371,6 @@
 
   .pill--accent {
     @apply border-accent-violet/25 text-accent-violet;
-  }
-
-  /* Agile */
-  .agile-grid {
-    @apply grid grid-cols-2 gap-4 sm:grid-cols-4;
-  }
-
-  .agile-card {
-    @apply flex flex-col items-center text-center;
-  }
-
-  .agile-card p {
-    @apply mt-3 text-sm font-medium text-content-secondary;
-  }
-
-  .agile-card__icon {
-    @apply text-2xl opacity-90;
   }
 
   /* Badge */
@@ -406,5 +413,11 @@
 
   .project-card.reveal.is-visible {
     transition-delay: calc(var(--delay, 0) * 90ms);
+  }
+
+  /* The reveal rules above reset `transform`; restore the hover lift without the stagger delay. */
+  .project-card.reveal.is-visible:hover {
+    transform: translateY(-3px);
+    transition-delay: 0s;
   }
 }
