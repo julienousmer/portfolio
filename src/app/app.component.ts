@@ -8,16 +8,16 @@ import {
   QueryList,
   ViewChildren,
   computed,
+  effect,
+  inject,
   signal,
 } from '@angular/core';
-import { AVATAR_PATH, Lang, PORTFOLIO_I18N, Skill } from './data/portfolio.data';
-import {
-  fadeIn,
-  fadeInUp,
-  heroSequence,
-  scaleIn,
-  staggerList,
-} from './animations/portfolio.animations';
+import { DOCUMENT } from '@angular/common';
+import { Meta, Title } from '@angular/platform-browser';
+import { Lang, PHOTO, PORTFOLIO_I18N, Project } from './data/portfolio.data';
+import { fadeIn, fadeInUp, heroSequence, scaleIn, staggerList } from './animations/portfolio.animations';
+
+const LANG_STORAGE_KEY = 'portfolio-lang';
 
 @Component({
   selector: 'app-root',
@@ -28,30 +28,35 @@ import {
 export class AppComponent implements AfterViewInit, OnDestroy {
   @HostBinding('class') readonly hostClass = 'block min-h-screen';
 
-  @HostBinding('attr.lang') get htmlLang() {
-    return this.lang();
-  }
-
   @ViewChildren('reveal') revealElements!: QueryList<ElementRef<HTMLElement>>;
 
-  readonly avatarPath = AVATAR_PATH;
+  private readonly document = inject(DOCUMENT);
+  private readonly title = inject(Title);
+  private readonly meta = inject(Meta);
+
+  readonly photo = PHOTO;
   readonly year = new Date().getFullYear();
 
-  lang = signal<Lang>('fr');
+  lang = signal<Lang>(this.initialLang());
   menuOpen = signal(false);
   navScrolled = signal(false);
   activeSection = signal('hero');
 
   content = computed(() => PORTFOLIO_I18N[this.lang()]);
 
-  readonly heroStats = [
-    { value: '3+', key: { fr: 'ans d’expérience', en: 'years experience' } },
-    { value: '130+', key: { fr: 'utilisateurs intranet', en: 'intranet users' } },
-    { value: '3000+', key: { fr: 'adhérents outillés', en: 'members served' } },
-  ];
-
   private observer?: IntersectionObserver;
   private sectionObserver?: IntersectionObserver;
+
+  constructor() {
+    // Keep <html lang>, the tab title and the meta description in sync with the language.
+    effect(() => {
+      const lang = this.lang();
+      const { meta } = this.content();
+      this.document.documentElement.lang = lang;
+      this.title.setTitle(meta.title);
+      this.meta.updateTag({ name: 'description', content: meta.description });
+    });
+  }
 
   @HostListener('window:scroll')
   onScroll(): void {
@@ -61,6 +66,11 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.onScroll();
     this.setupObservers();
+    // Only a language switch re-renders reveal elements: show them at once instead of
+    // hiding content the visitor has already seen.
+    this.revealElements.changes.subscribe(() =>
+      this.revealElements.forEach((el) => el.nativeElement.classList.add('is-visible'))
+    );
   }
 
   ngOnDestroy(): void {
@@ -69,14 +79,13 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   }
 
   setLang(next: Lang): void {
-    if (this.lang() !== next) {
-      this.lang.set(next);
-      setTimeout(() => this.setupObservers(), 0);
+    if (this.lang() === next) return;
+    this.lang.set(next);
+    try {
+      localStorage.setItem(LANG_STORAGE_KEY, next);
+    } catch {
+      /* storage unavailable: the choice simply isn't remembered */
     }
-  }
-
-  statLabel(stat: (typeof this.heroStats)[0]): string {
-    return stat.key[this.lang()];
   }
 
   toggleMenu(): void {
@@ -88,23 +97,34 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  skillsByCategory(category: Skill['category']): Skill[] {
-    return this.content().skills.filter((s) => s.category === category);
-  }
-
-  projectStatusLabel(status: 'private' | 'notDeployed'): string {
+  projectStatusLabel(status: Project['status']): string {
     const s = this.content().sections.projects;
-    return status === 'notDeployed' ? s.notDeployed : s.private;
+    return status === 'school' ? s.school : s.private;
   }
 
   isFeaturedSection(id: string): boolean {
     return id === 'experience' || id === 'projects';
   }
 
-  private setupObservers(): void {
-    this.observer?.disconnect();
-    this.sectionObserver?.disconnect();
+  private initialLang(): Lang {
+    try {
+      const saved = localStorage.getItem(LANG_STORAGE_KEY);
+      if (saved === 'fr' || saved === 'en') return saved;
+    } catch {
+      /* storage unavailable */
+    }
+    return navigator.language?.toLowerCase().startsWith('fr') === false ? 'en' : 'fr';
+  }
 
+  private observeReveals(): void {
+    this.revealElements?.forEach((el) => {
+      if (!el.nativeElement.classList.contains('is-visible')) {
+        this.observer?.observe(el.nativeElement);
+      }
+    });
+  }
+
+  private setupObservers(): void {
     this.observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -116,11 +136,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
       },
       { threshold: 0.08, rootMargin: '0px 0px -5% 0px' }
     );
-
-    this.revealElements?.forEach((el) => {
-      el.nativeElement.classList.remove('is-visible');
-      this.observer?.observe(el.nativeElement);
-    });
+    this.observeReveals();
 
     const sections = document.querySelectorAll<HTMLElement>('section[id]');
     this.sectionObserver = new IntersectionObserver(

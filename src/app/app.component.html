@@ -96,20 +96,17 @@
           <p class="hero-line hero__tagline">{{ content().tagline }}</p>
 
           <div class="hero-line hero__ctas">
-            <button type="button" (click)="scrollTo('experience')" class="btn-primary">
-              {{ content().hero.ctaExperience }}
+            <a [href]="content().cvPath" download class="btn-primary">{{ content().hero.ctaCv }}</a>
+            <button type="button" (click)="scrollTo('contact')" class="btn-secondary">
+              {{ content().hero.ctaContact }}
             </button>
-            <button type="button" (click)="scrollTo('projects')" class="btn-secondary">
-              {{ content().hero.ctaProjects }}
-            </button>
-            <a [href]="'mailto:' + content().email" class="btn-ghost">{{ content().hero.ctaContact }}</a>
           </div>
 
           <div class="hero-line hero__stats">
-            @for (stat of heroStats; track stat.value) {
+            @for (stat of content().stats; track $index) {
               <div class="stat">
                 <span class="stat__value">{{ stat.value }}</span>
-                <span class="stat__label">{{ statLabel(stat) }}</span>
+                <span class="stat__label">{{ stat.label }}</span>
               </div>
             }
           </div>
@@ -126,7 +123,10 @@
         <div class="hero-line hero__visual">
           <div class="avatar-wrap">
             <div class="avatar-ring" aria-hidden="true"></div>
-            <img [src]="avatarPath" [alt]="content().name" width="280" height="280" class="avatar-img" />
+            <picture>
+              <source [srcset]="photo.webp" type="image/webp" />
+              <img [src]="photo.jpg" [alt]="content().photoAlt" width="640" height="640" class="avatar-img" />
+            </picture>
           </div>
         </div>
       </div>
@@ -137,13 +137,7 @@
       <div #reveal class="reveal section__head">
         <span class="section__label">{{ content().sections.experience.label }}</span>
         <h2 class="section__title">{{ content().sections.experience.title }}</h2>
-        <p class="section__desc">
-          @if (lang() === 'fr') {
-            3 ans chez Cerfrance Lot — de l’alternance au CDD, du legacy Symfony aux outils métiers à grande échelle.
-          } @else {
-            3 years at Cerfrance Lot — from work-study to fixed-term, from legacy PHP to large-scale business tools.
-          }
-        </p>
+        <p class="section__desc">{{ content().sections.experience.intro }}</p>
       </div>
 
       <ol class="timeline">
@@ -151,7 +145,6 @@
           <li
             #reveal
             class="reveal timeline__item"
-            [class.timeline__item--edu]="i === 3"
             [style.--delay]="i"
           >
             <div class="timeline__marker" aria-hidden="true"></div>
@@ -186,6 +179,9 @@
             </div>
             <h3 class="project-card__title">{{ project.title }}</h3>
             <p class="project-card__desc">{{ project.description }}</p>
+            <p class="project-card__role">
+              <span>{{ content().sections.projects.role }} :</span> {{ project.role }}
+            </p>
             <ul class="project-card__tags">
               @for (tag of project.tags; track tag) {
                 <li>{{ tag }}</li>
@@ -209,13 +205,26 @@
             <p>{{ paragraph }}</p>
           }
         </div>
-        <div #reveal class="reveal" @scaleIn>
-          <article class="card card--education">
-            <span class="badge badge--accent">{{ content().education.level }}</span>
-            <h3 class="mt-4 text-lg font-semibold text-content">{{ content().education.degree }}</h3>
-            <p class="mt-1 text-sm font-medium text-accent-violet">{{ content().education.school }}</p>
-            <p class="text-xs text-content-muted">{{ content().education.period }}</p>
-            <p class="mt-4 text-sm leading-relaxed text-content-secondary">{{ content().education.description }}</p>
+        <div #reveal class="reveal about__aside" @scaleIn>
+          <article class="card">
+            <h3 class="aside__title">{{ content().sections.education.label }}</h3>
+            <ol class="education-list">
+              @for (edu of content().education; track $index) {
+                <li>
+                  <p class="education-list__degree">{{ edu.degree }}</p>
+                  <p class="education-list__meta">{{ edu.school }} · {{ edu.period }}</p>
+                  @if (edu.description) {
+                    <p class="education-list__desc">{{ edu.description }}</p>
+                  }
+                </li>
+              }
+            </ol>
+            <h3 class="aside__title mt-6">{{ content().sections.about.languages }}</h3>
+            <ul class="mt-3 space-y-1 text-sm text-content-secondary">
+              @for (language of content().languages; track $index) {
+                <li>{{ language }}</li>
+              }
+            </ul>
           </article>
         </div>
       </div>
@@ -229,47 +238,15 @@
       </div>
 
       <div class="skills-grid" @staggerList>
-        <article class="card skill-card">
-          <h3>{{ content().sections.skills.dev }}</h3>
-          <ul>
-            @for (skill of skillsByCategory('dev'); track skill.name) {
-              <li><span class="pill">{{ skill.name }}</span></li>
-            }
-          </ul>
-        </article>
-        <article class="card skill-card">
-          <h3>{{ content().sections.skills.agile }}</h3>
-          <ul>
-            @for (skill of skillsByCategory('agile'); track skill.name) {
-              <li><span class="pill pill--accent">{{ skill.name }}</span></li>
-            }
-          </ul>
-        </article>
-        <article class="card skill-card">
-          <h3>{{ content().sections.skills.tools }}</h3>
-          <ul>
-            @for (skill of skillsByCategory('tools'); track skill.name) {
-              <li><span class="pill">{{ skill.name }}</span></li>
-            }
-          </ul>
-        </article>
-      </div>
-    </section>
-
-    <!-- Agile -->
-    <section id="agile" class="section">
-      <div #reveal class="reveal section__head">
-        <span class="section__label">{{ content().sections.agile.label }}</span>
-        <h2 class="section__title">{{ content().sections.agile.title }}</h2>
-        <p class="section__desc">{{ content().sections.agile.intro }}</p>
-      </div>
-
-      <div class="agile-grid">
-        @for (item of content().scrumHighlights; track item.label; let i = $index) {
-          <div #reveal class="reveal card agile-card" [style.--delay]="i">
-            <span class="agile-card__icon" aria-hidden="true">{{ item.icon }}</span>
-            <p>{{ item.label }}</p>
-          </div>
+        @for (group of content().skills; track $index) {
+          <article class="card skill-card">
+            <h3>{{ group.title }}</h3>
+            <ul>
+              @for (skill of group.items; track skill) {
+                <li><span class="pill" [class.pill--accent]="group.accent">{{ skill }}</span></li>
+              }
+            </ul>
+          </article>
         }
       </div>
     </section>
@@ -282,6 +259,7 @@
         <p class="mt-4 max-w-md text-content-secondary">{{ content().sections.contact.intro }}</p>
         <div class="contact-card__actions">
           <a [href]="'mailto:' + content().email" class="btn-primary">{{ content().email }}</a>
+          <a [href]="content().cvPath" download class="btn-secondary">{{ content().sections.contact.cv }}</a>
           <a [href]="content().github" target="_blank" rel="noopener noreferrer" class="btn-secondary">GitHub</a>
           <a [href]="content().linkedin" target="_blank" rel="noopener noreferrer" class="btn-ghost">LinkedIn</a>
         </div>
