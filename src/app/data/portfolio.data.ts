@@ -100,7 +100,7 @@ const SHARED = {
   name: 'Julien Devienne-Ousmer',
   email: 'julienousmer46090@gmail.com',
   github: 'https://github.com/julienousmer',
-  linkedin: 'https://www.linkedin.com/in/julien-devienne-ousmer-854611223/',
+  linkedin: 'https://www.linkedin.com/in/julien-devienne-ousmer/',
   cvPath: 'CV_Julien_Devienne-Ousmer.pdf',
 };
 
@@ -153,14 +153,14 @@ const LAYERS: { name: Record<Lang, string>; note: Record<Lang, string>; tools: {
   },
   {
     name: { fr: 'Qualité & livraison', en: 'Quality & delivery' },
-    note: { fr: 'Testé à chaque push, livré en sprints', en: 'Tested on every push, shipped in sprints' },
+    note: { fr: 'Testé à chaque push, livré par petites étapes', en: 'Tested on every push, shipped in small steps' },
     tools: [
       { tool: T.phpunit, meta: { fr: 'Tests unitaires et d’intégration', en: 'Unit and integration tests' } },
       { tool: T.gitlab, meta: { fr: 'Les tests à chaque push', en: 'Tests on every push' } },
       { tool: T.docker, meta: { fr: 'Environnements locaux', en: 'Local environments' } },
       { tool: T.git, meta: { fr: 'Branches et revues', en: 'Branches and reviews' } },
       { tool: T.linux, meta: { fr: 'Serveurs et terminal', en: 'Servers and shell' } },
-      { tool: T.jira, meta: { fr: 'Sprints Scrum', en: 'Scrum sprints' } },
+      { tool: T.jira, meta: { fr: 'Suivi des tickets', en: 'Issue tracking' } },
     ],
   },
 ];
@@ -305,7 +305,7 @@ const FR: PortfolioContent = {
     label: 'Compétences',
     title: 'Ma stack, couche par couche.',
     titleMuted: 'De l’interface à la mise en production.',
-    methods: 'Scrum et Kanban au quotidien. Je participe aux cérémonies et j’en anime certaines.',
+    methods: 'Je travaille en Scrum sur certains projets et je m’organise en Kanban au besoin.',
     request: 'requête',
     response: 'réponse',
     layers: layersFor('fr'),
@@ -449,7 +449,7 @@ const EN: PortfolioContent = {
     label: 'Skills',
     title: 'My stack, layer by layer.',
     titleMuted: 'From the interface to production.',
-    methods: 'Scrum and Kanban day to day. I take part in the ceremonies and facilitate some of them.',
+    methods: 'I work in Scrum on some projects and use Kanban when it fits.',
     request: 'request',
     response: 'response',
     layers: layersFor('en'),
